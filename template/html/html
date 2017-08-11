@@ -9,6 +9,7 @@
 </head>
 <body>
      [~]
+     <script>var lastSlide = [~];</script>
      <script src="main.js"></script>
 </body>
 </html>

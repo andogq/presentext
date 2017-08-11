@@ -32,13 +32,11 @@ else:
     print("[+] Loaded all templates")
 
     html = template["html"][0]
-    # Check to see if content tag is open
+
+    firstLine = True
+    slideOpen = False
     contentOpen = False
-    # Check to see if a title has been added
-    slideTitleAdded = False
-    slideNum = 0
-    # Check for presentation heading has been added
-    headingAdded = False
+    slideCounter = 0
 
     print("[-] Parsing input file")
     # Parses the input file
@@ -52,49 +50,73 @@ else:
                 counter = -1
                 break
 
-        # Removes dashes and extra spaces from start of line
-        line = "".join(line)[counter + 1:]
+        # Removes dashes and extra spaces from start of line and newline from end
+        line = "".join(line)[counter + 1:len(line) - 1].strip()
 
-        # Determines what needs to be added to the file
-        # Presentation heading. Only one in the presentation
-        if counter < 0:
-            if not headingAdded:
-                print("    [+] Heading")
+        if firstLine:
+            # Line type is a heading
+            if counter == -1:
+                print("    [+] Adding heading to presentation")
                 html += line + template["html"][1]
-                headingAdded = True
+
+            # No heading supplied
             else:
-                print("    [!] Warning: Cannot have two headings in the presentation. Moving on")
+                print("    [+] Adding default heading to presentation")
+                html += "Presentation" + template["html"][1]
+            firstLine = False
 
-        if headingAdded:
-            # Title of slide. One per slide
-            if counter == 0:
-                print("    [+] Creating new slide")
-                if not slideTitleAdded:
-                    html += template["slide"][0] + str(slideNum) + template["slide"][1] + template["heading"][0] + line[1:] + template["heading"][1]
-                    slideTitleAdded = True
-                    slideNum += 1
-                else:
-                    if contentOpen:
-                        html += template["contentSection"][0]
-                        contentOpen = False
-                    html += template["slide"][2] + template["slide"][0] + str(slideNum) + template["slide"][1] + template["heading"][0] + line[1:] + template["heading"][1]
-                    slideTitleAdded = False
-                    slideNum = 0
+        # Slide title (automatically makes new slide)
+        if counter == 0:
+            print("    [+] Creating title and slide")
+            if slideOpen:
+                if contentOpen:
 
+                    # Close content section
+                    print("        [+] Closing content section")
+                    html += template["contentSection"][1]
+                    contentOpen = False
 
-            # Dot point on slide. Multiple per slide
-            elif counter == 1:
-                print("    [+] Content")
-                if not contentOpen:
-                    html += template["contentSection"][0]
-                    contentOpen = True
-                html += template["content"][0] + line[1:] + template["content"][1]
-        else:
-            print("    [!] No heading supplied. Using 'Presentation'")
-            html += "Presentation" + template["html"][1]
-            headingAdded = True
+                # Close slide
+                print("        [+] Closing slide")
+                html += template["slide"][2]
+                slideOpen = False
 
-    html += template["contentSection"][1] + template["slide"][2] + template["html"][2]
+            # Create title and slide
+            slideTitle = template["heading"][0] + line + template["heading"][1]
+            html += template["slide"][0] + str(slideCounter) + template["slide"][1] + slideTitle
+            slideOpen = True
+            slideCounter += 1
+            print("    [+] Created new slide")
+
+        # Content type
+        elif counter == 1:
+            print("    [+] Creating new content section")
+            if not contentOpen:
+
+                # Create new content section
+                print("        [+] Closing content section")
+                html += template["contentSection"][0]
+                contentOpen = True
+
+            # Add line to content section
+            html += template["content"][0] + line + template["content"][1]
+            print("    [+] Created new content section")
+
+    print("    [+] Running final checks on tags")
+    # Checks to run before closing final tags
+    if contentOpen:
+        # Close content
+        print("        [+] Closing content section")
+        html += template["contentSection"][1]
+        contentOpen = False
+    if slideOpen:
+        # Close slide
+        print("        [+] Closing slide")
+        html += template["slide"][2]
+        slideOpen = False
+    
+    # Close final tags
+    html += template["html"][2] + str(slideCounter) + template["html"][3]
     print("[+] Successfully parsed input file")
 
     # Checks for output directory and creates one if needed
