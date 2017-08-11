@@ -13,6 +13,7 @@
         <p onclick="slideShow.prev()"><</p>
         <p onclick="slideShow.next()">></p>
      </div>
+     <div id="progress"></div>
      <script>var lastSlide = [~];</script>
      <script src="main.js"></script>
 </body>
