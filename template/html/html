@@ -9,6 +9,10 @@
 </head>
 <body>
      [~]
+     <div id="controls">
+        <p onclick="slideShow.prev()"><</p>
+        <p onclick="slideShow.next()">></p>
+     </div>
      <script>var lastSlide = [~];</script>
      <script src="main.js"></script>
 </body>

@@ -23,6 +23,19 @@ ul {
      top: 100px;
 }
 
+#controls {
+    font-size: 30px;
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    bottom: 10px;
+}
+
+#controls > * {
+    display: inline;
+    cursor: pointer;
+}
+
 .active {
      opacity: 1;
 }
