@@ -1,0 +1,42 @@
+var currentSlide = 0;
+// lastSlide declared in document
+var progressBar = document.getElementById("progress");
+
+var slideShow = {
+     show: function(slideNum) {
+          var slide = document.getElementById("slide" + slideNum);
+          slide.classList.remove("offScreen");
+          slide.classList.add("active");
+     },
+     hide: function(slideNum) {
+          var slide = document.getElementById("slide" + slideNum);
+          slide.classList.remove("active");
+          slide.classList.add("offScreen");
+     },
+     next: function() {
+          if (currentSlide < lastSlide) {
+               slideShow.show(currentSlide + 1);
+               slideShow.hide(currentSlide);
+               currentSlide += 1;
+               progressBar.style.width = (window.innerWidth / lastSlide) * currentSlide + "px";
+          }
+     },
+     prev: function() {
+          if (currentSlide > 0) {
+               slideShow.show(currentSlide - 1);
+               slideShow.hide(currentSlide);
+               currentSlide -= 1;
+               progressBar.style.width = (window.innerWidth / lastSlide) * currentSlide + "px";
+          }
+     }
+}
+
+slideShow.show(0);
+
+document.onkeydown = function(event) {
+     if (event.key == "ArrowRight" || event.key == " ") {
+          slideShow.next();
+     } else if (event.key == "ArrowLeft") {
+          slideShow.prev();
+     }
+}

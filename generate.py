@@ -125,7 +125,30 @@ else:
         os.makedirs("./output")
 
     # Write to output file
-    print("[-] Writing as 'output.html'")
+    print("[+] Writing as 'output.html'")
     with open("./output/output.html", "w+") as f:
         f.write(html)
+    
+    # Save js and css files into output folder
+    print("[+] Opening css and js files")
+    with open("./template/css") as f:
+        css = f.read()
+    with open("./template/js") as f:
+        js = f.read()
+    
+    print("[+] Writing css and js files")
+    with open("./output/main.css", "w+") as f:
+        f.write(css)
+    with open("./output/main.js", "w+") as f:
+        f.write(js)
     print("[+] Completed")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
