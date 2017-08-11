@@ -116,7 +116,7 @@ else:
         slideOpen = False
     
     # Close final tags
-    html += template["html"][2] + str(slideCounter) + template["html"][3]
+    html += template["html"][2] + str(slideCounter - 1) + template["html"][3]
     print("[+] Successfully parsed input file")
 
     # Checks for output directory and creates one if needed
