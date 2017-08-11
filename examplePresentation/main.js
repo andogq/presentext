@@ -34,6 +34,7 @@ var slideShow = {
      }
 }
 
+slideShow.show(0);
 
 document.onkeydown = function(event) {
      if (event.key == "ArrowRight" || event.key == " ") {
