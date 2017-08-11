@@ -9,23 +9,23 @@ if len(sys.argv) < 2:
 else:
     print("[-] Loading templates")
     # Opens template files
-    with open("./template/html/html") as f:
+    with open("./template/html/html.txt") as f:
         template["html"] = f.read().split("[~]")
         print("    [+] Loaded html template")
 
-    with open("./template/html/slide") as f:
+    with open("./template/html/slide.txt") as f:
         template["slide"] = f.read().split("[~]")
         print("    [+] Loaded slide template")
 
-    with open("./template/html/heading") as f:
+    with open("./template/html/heading.txt") as f:
         template["heading"] = f.read().split("[~]")
         print("    [+] Loaded heading template")
 
-    with open("./template/html/contentSection") as f:
+    with open("./template/html/contentSection.txt") as f:
         template["contentSection"] = f.read().split("[~]")
         print("    [+] Loaded content section template")
 
-    with open("./template/html/content") as f:
+    with open("./template/html/content.txt") as f:
         template["content"] = f.read().split("[~]")
         print("    [+] Loaded content template")
 
@@ -114,7 +114,7 @@ else:
         print("        [+] Closing slide")
         html += template["slide"][2]
         slideOpen = False
-    
+
     # Close final tags
     html += template["html"][2] + str(slideCounter - 1) + template["html"][3]
     print("[+] Successfully parsed input file")
@@ -128,27 +128,17 @@ else:
     print("[+] Writing as 'output.html'")
     with open("./output/output.html", "w+") as f:
         f.write(html)
-    
-    # Save js and css files into output folder
+
+        # Save js and css files into output folder
     print("[+] Opening css and js files")
-    with open("./template/css") as f:
+    with open("./template/css.txt") as f:
         css = f.read()
-    with open("./template/js") as f:
+    with open("./template/js.txt") as f:
         js = f.read()
-    
+
     print("[+] Writing css and js files")
     with open("./output/main.css", "w+") as f:
         f.write(css)
     with open("./output/main.js", "w+") as f:
         f.write(js)
     print("[+] Completed")
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
