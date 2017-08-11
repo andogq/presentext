@@ -24,11 +24,11 @@ ul {
 }
 
 .active {
-     left: 10%;
+     opacity: 1;
 }
 
 .offScreen {
-     left: -110%;
+     opacity: 0;
 }
 
 .slide {
@@ -36,6 +36,8 @@ ul {
      width: 80%;
      height: 80%;
      top: 10%;
+     left: 10%;
+     transition: opacity 1s;
 }
 
 .slide > * {
