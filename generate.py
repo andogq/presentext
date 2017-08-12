@@ -1,6 +1,7 @@
 import sys
 import fileinput
 import os
+from random import randint
 
 template = {}
 
@@ -129,12 +130,24 @@ else:
     with open("./output/output.html", "w+") as f:
         f.write(html)
 
-        # Save js and css files into output folder
-    print("[+] Opening css and js files")
+    # Save js and css files into output folder
+    print("[+] Opening css and js template files")
     with open("./template/css.txt") as f:
-        css = f.read()
+        css = f.read().split("[~]")
     with open("./template/js.txt") as f:
         js = f.read()
+
+    print("[+] Generating theme")
+    # Makes a rgb color
+    randomColor = [randint(0,255), randint(0,255), randint(0,255)]
+    # 383 = (255 * 3) / 2
+    if sum(randomColor[0:len(randomColor)]) < 383:
+        textColor = "white"
+    else:
+        textColor = "black"
+    randomColor = "rgb(" + str(randomColor)[1:-1] + ")"
+    print("    [+] Using " + randomColor + " with " + textColor + " text")
+    css = css[0] + textColor + css[1] + randomColor + css[2] + textColor + css[3]
 
     print("[+] Writing css and js files")
     with open("./output/main.css", "w+") as f:

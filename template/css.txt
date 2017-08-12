@@ -2,13 +2,13 @@
      padding: 0;
      margin: 0;
      font-family: sans-serif;
-     color: white;
+     color: [~];
 }
 
 html,body {
      width: 100%;
      height: 100%;
-     background: darkblue;
+     background: [~];
 }
 
 h1 {
@@ -42,7 +42,7 @@ ul {
     left: 0;
     width: 0;
     height: 5px;
-    background: white;
+    background: [~];
     transition: width 1s;
 }
 
