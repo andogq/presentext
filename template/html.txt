@@ -9,7 +9,7 @@ be added such as other scripts/styles.
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <meta http-equiv="X-UA-Compatible" content="ie=edge">
      <title>[~title]</title>
-     <link href="main.css" rel="stylesheet" type="text/css"/>
+     [~css]
 </head>
 <body>
      [~slideSection]
@@ -18,7 +18,7 @@ be added such as other scripts/styles.
           <p onclick="slideShow.next()">></p>
      </div>
      <div id="progress"></div>
-     <script src="main.js"></script>
+     [~script]
 </body>
 </html>
 [~html]
