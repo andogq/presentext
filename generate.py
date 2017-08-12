@@ -25,6 +25,10 @@ def checkFile(filePath):
         print("[!] Missing file/directory or insufficent permissions: {}".format(filePath))
         sys.exit()
 
+# Returns the substring between two placeholders
+def extractString(string, placeholder):
+    return string.split(placeholder)[1]
+
 
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
@@ -46,11 +50,11 @@ else:
     print("[+] Loading templates")
     with open("./template/html.txt") as f:
         f = f.read()
-        template["html"] = f.split("[~html]")[1]
-        template["slide"] = f.split("[~slide]")[1]
-        template["heading"] = f.split("[~heading]")[1]
-        template["contentSection"] = f.split("[~contentSection]")[1]
-        template["content"] = f.split("[~content]")[1]
+        template["html"] = extractString(f, "[~html]")
+        template["slide"] = extractString(f, "[~slide]")
+        template["heading"] = extractString(f, "[~heading]")
+        template["contentSection"] = extractString(f, "[~contentSection]")
+        template["content"] = extractString(f, "[~content]")
     print("[+] Loaded all templates")
 
     # Holds the html file
