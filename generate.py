@@ -56,6 +56,8 @@ else:
             # No heading supplied
             else:
                 title = "Presentation"
+
+            # Puts the heading in the page
             html = html.replace("[~title]", title)
             firstLine = False
 
@@ -65,16 +67,17 @@ else:
                 if contentOpen:
 
                     # Close content section
-                    html += template["contentSection"][1]
+                    slideContent += template["contentSection"].replace("[~contentSectionContent]", contentSectionContent + "[~contentSectionContent]")
                     contentOpen = False
 
                 # Close slide
-                html += template["slide"][2]
+                slide = template["slide"].replace("[~slideContent]", slideContent).replace("[~slideId]", str(slideCounter - 1)) + "[~slideSection]"
+                html = html.replace("[~slideSection]", slide)
                 slideOpen = False
 
             # Create title and slide
-            slideTitle = template["heading"][0] + line + template["heading"][1]
-            html += template["slide"][0] + str(slideCounter) + template["slide"][1] + slideTitle
+            heading = template["heading"].replace("[~headingContent]", line)
+            slideContent = heading + "[~slideContent]"
             slideOpen = True
             slideCounter += 1
 
@@ -83,24 +86,15 @@ else:
             if not contentOpen:
 
                 # Create new content section
-                html += template["contentSection"][0]
+                contentSectionContent = template["contentSection"]
                 contentOpen = True
 
             # Add line to content section
-            html += template["content"][0] + line + template["content"][1]
+            contentSectionContent = template["content"].replace("[~contentContent]", line + "[~contentContent]")
 
-    # Checks to run before closing final tags
-    if contentOpen:
-        # Close content
-        html += template["contentSection"][1]
-        contentOpen = False
-    if slideOpen:
-        # Close slide
-        html += template["slide"][2]
-        slideOpen = False
+    # Get rid of placeholders
+    html = html.replace("[~slideContent]", "").replace("[~contentSectionContent]", "").replace("[~contentSection]", "").replace("[~contentContent]", "").replace("[~slideSection]", "").replace("[~slideCounter]", str(slideCounter - 2))
 
-    # Close final tags
-    html += template["html"][2] + str(slideCounter - 1) + template["html"][3]
     print("[+] Successfully parsed input file")
 
     # Checks for output directory and creates one if needed
