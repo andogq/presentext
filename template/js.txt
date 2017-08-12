@@ -36,7 +36,6 @@ var body = document.body;
 function userInteraction(event) {
     if (event.type == "click") {
         slideShow.next();
-        console.log(event);
     } else {
         if (event.key == "ArrowRight" || event.key == " ") {
              slideShow.next();

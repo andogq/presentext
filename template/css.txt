@@ -23,6 +23,21 @@ ul {
      top: 100px;
 }
 
+#left, #right {
+    position: fixed;
+    top: 0;
+    width: 50%;
+    height: 100%;
+}
+
+#left {
+    left: 0;
+}
+
+#right {
+    right: 0;
+}
+
 #controls {
     font-size: 30px;
     position: fixed;

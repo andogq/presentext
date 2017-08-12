@@ -13,6 +13,8 @@ be added such as other scripts/styles.
 </head>
 <body>
      [~slideSection]
+     <div id="left" onclick="slideShow.prev()"></div>
+     <div id="right" onclick="slideShow.next()"></div>
      <div id="controls">
           <p onclick="slideShow.prev()"><</p>
           <p onclick="slideShow.next()">></p>
