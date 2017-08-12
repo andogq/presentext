@@ -6,6 +6,19 @@ from random import randint
 template = {}
 customMode = False
 
+colors = {
+    "red": [255, 0, 0],
+    "pink": [255, 193, 203],
+    "orange": [255, 165, 0],
+    "yellow": [255, 195, 0],
+    "purple": [128, 0, 128],
+    "green": [0, 255, 0],
+    "blue": [0, 0, 255],
+    "brown": [165, 42, 42],
+    "white": [255, 255, 255],
+    "gray": [128, 128, 128]
+}
+
 if len(sys.argv) < 2:
     print("Usage: {} [/path/to/file]".format(sys.argv[0]))
 else:
@@ -99,15 +112,34 @@ else:
 
     print("[+] Generating theme")
     # Makes a rgb color
-    randomColor = [randint(0,255), randint(0,255), randint(0,255)]
+    if customMode:
+        backgroundColor = input("    [+] Pick a background color (basic color name or rgb value): ")
+        if backgroundColor in colors:
+            backgroundColor = colors[backgroundColor]
+        elif backgroundColor[:3] == "rgb":
+            try:
+                backgroundColor = [int(i) for i in backgroundColor[4:].split(" ") if (int(i) <= 255) and (int(i) >= 0)]
+            except:
+                print("    [+] Not a valid rgb value. Try 'rgb 123 123 123'")
+                backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
+        else:
+            print("    [+] Not a valid rgb value. Try 'rgb 123 123 123'")
+            backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
+
+    else:
+        backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
+
     # 383 = (255 * 3) / 2
-    if sum(randomColor[0:len(randomColor)]) < 383:
+    if sum(backgroundColor[0:len(backgroundColor)]) < 383:
         textColor = "white"
     else:
         textColor = "black"
-    randomColor = "rgb(" + str(randomColor)[1:-1] + ")"
-    print("    [+] Using " + randomColor + " with " + textColor + " text")
-    css = css[0] + textColor + css[1] + randomColor + css[2] + textColor + css[3]
+
+    backgroundColor = "rgb(" + str(backgroundColor)[1:-1] + ")"
+
+    print("    [+] Using " + backgroundColor + " with " + textColor + " text")
+
+    css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
 
     print("[+] Writing css and js files")
     with open("./output/main.css", "w+") as f:
@@ -115,6 +147,3 @@ else:
     with open("./output/main.js", "w+") as f:
         f.write(js)
     print("[+] Completed")
-
-    if customMode:
-        print("Custom")
