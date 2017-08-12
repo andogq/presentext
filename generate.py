@@ -16,28 +16,19 @@ else:
 
     print("[+] Loading templates")
     # Opens template files
-    with open("./template/html/html.txt") as f:
-        template["html"] = f.read().split("[~]")
-
-    with open("./template/html/slide.txt") as f:
-        template["slide"] = f.read().split("[~]")
-
-    with open("./template/html/heading.txt") as f:
-        template["heading"] = f.read().split("[~]")
-
-    with open("./template/html/contentSection.txt") as f:
-        template["contentSection"] = f.read().split("[~]")
-
-    with open("./template/html/content.txt") as f:
-        template["content"] = f.read().split("[~]")
+    with open("./template/html.txt") as f:
+        f = f.read()
+        template["html"] = f.split("[~html]")[1]
+        template["slide"] = f.split("[~slide]")[1]
+        template["heading"] = f.split("[~heading]")[1]
+        template["contentSection"] = f.split("[~contentSection]")[1]
+        template["content"] = f.split("[~content]")[1]
 
     print("[+] Loaded all templates")
 
-    html = template["html"][0]
+    html = template["html"]
 
     firstLine = True
-    slideOpen = False
-    contentOpen = False
     slideCounter = 0
 
     print("[-] Parsing input file")
@@ -58,55 +49,35 @@ else:
         if firstLine:
             # Line type is a heading
             if counter == -1:
-                html += line + template["html"][1]
+                title = line
 
             # No heading supplied
             else:
-                html += "Presentation" + template["html"][1]
+                title = "Presentation"
+
+            # Puts the heading in the page
+            html = html.replace("[~title]", title)
             firstLine = False
 
-        # Slide title (automatically makes new slide)
+        # Slide heading (automatically makes new slide)
         if counter == 0:
-            if slideOpen:
-                if contentOpen:
-
-                    # Close content section
-                    html += template["contentSection"][1]
-                    contentOpen = False
-
-                # Close slide
-                html += template["slide"][2]
-                slideOpen = False
-
-            # Create title and slide
-            slideTitle = template["heading"][0] + line + template["heading"][1]
-            html += template["slide"][0] + str(slideCounter) + template["slide"][1] + slideTitle
-            slideOpen = True
+            # Clears tags from previous slide
+            html = html.replace("[~contentSectionContent]", "")
+            # Adds a new slide
+            html = html.replace("[~slideSection]", template["slide"] + "[~slideSection]")
+            # Puts in slide ID
+            html = html.replace("[~slideId]", str(slideCounter))
+            # Adds a heading to the slide and adds the ul element to house the points
+            html = html.replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
             slideCounter += 1
 
         # Content type
         elif counter == 1:
-            if not contentOpen:
+            # Adds another point and puts the line in the content section
+            html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
-                # Create new content section
-                html += template["contentSection"][0]
-                contentOpen = True
+    html = html.replace("[~slideCounter]", str(slideCounter - 2)).replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
 
-            # Add line to content section
-            html += template["content"][0] + line + template["content"][1]
-
-    # Checks to run before closing final tags
-    if contentOpen:
-        # Close content
-        html += template["contentSection"][1]
-        contentOpen = False
-    if slideOpen:
-        # Close slide
-        html += template["slide"][2]
-        slideOpen = False
-
-    # Close final tags
-    html += template["html"][2] + str(slideCounter - 1) + template["html"][3]
     print("[+] Successfully parsed input file")
 
     # Checks for output directory and creates one if needed
