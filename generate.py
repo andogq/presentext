@@ -29,8 +29,6 @@ else:
     html = template["html"]
 
     firstLine = True
-    slideOpen = False
-    contentOpen = False
     slideCounter = 0
 
     print("[-] Parsing input file")
