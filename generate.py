@@ -63,11 +63,19 @@ else:
 
         # Slide heading (automatically makes new slide)
         if counter == 0:
-            html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", template["slide"] + "[~slideSection]").replace("[~slideId]", str(slideCounter)).replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
+            # Clears tags from previous slide
+            html = html.replace("[~contentSectionContent]", "")
+            # Adds a new slide
+            html = html.replace("[~slideSection]", template["slide"] + "[~slideSection]")
+            # Puts in slide ID
+            html = html.replace("[~slideId]", str(slideCounter))
+            # Adds a heading to the slide and adds the ul element to house the points
+            html = html.replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
             slideCounter += 1
 
         # Content type
         elif counter == 1:
+            # Adds another point and puts the line in the content section
             html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
     html = html.replace("[~slideCounter]", str(slideCounter - 2)).replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
