@@ -31,23 +31,35 @@ var slideShow = {
      }
 }
 
-slideShow.show(0);
 
 var body = document.body;
-document.onkeydown = function(event) {
-     if (event.key == "ArrowRight" || event.key == " ") {
-          slideShow.next();
-     } else if (event.key == "ArrowLeft") {
-          slideShow.prev();
-     }
+function userInteraction(event) {
+    if (event.type == "mousedown") {
+        slideShow.next();
+    } else {
+        if (event.key == "ArrowRight" || event.key == " ") {
+             slideShow.next();
+        } else if (event.key == "ArrowLeft") {
+             slideShow.prev();
+        }
+    }
 
-     if (body.requestFullscreen) {
-     	body.requestFullscreen();
-     } else if (body.webkitRequestFullscreen) {
-     	body.webkitRequestFullscreen();
-     } else if (body.mozRequestFullScreen) {
-     	body.mozRequestFullScreen();
-     } else if (body.msRequestFullscreen) {
-     	body.msRequestFullscreen();
-     }
+    if (body.requestFullscreen) {
+        body.requestFullscreen();
+    } else if (body.webkitRequestFullscreen) {
+        body.webkitRequestFullscreen();
+    } else if (body.mozRequestFullScreen) {
+        body.mozRequestFullScreen();
+    } else if (body.msRequestFullscreen) {
+        body.msRequestFullscreen();
+    }
+}
+
+slideShow.show(0);
+
+document.onkeydown = function(event) {
+     userInteraction(event);
+}
+document.onmousedown = function(event) {
+     userInteraction(event);
 }
