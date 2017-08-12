@@ -29,6 +29,23 @@ def checkFile(filePath):
 def extractString(string, placeholder):
     return string.split(placeholder)[1]
 
+def saveSingle(html, js, css):
+    print("[+] Writing to ./output/index.html")
+    html = html.replace("[~css]", "<style>" + css + "</style>")
+    html = html.replace("[~script]", "<script>" + js + "</script>")
+    with open("./output/index.html", "w+") as f:
+        f.write(html)
+
+def saveMultiple(html, js, css):
+    print("[+] Writing to files in ./output")
+    html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
+    html = html.replace("[~script]", '<script src="main.js"></script>')
+    with open("./output/index.html", "w+") as f:
+        f.write(html)
+    with open("./output/main.css", "w+") as f:
+        f.write(css)
+    with open("./output/main.js", "w+") as f:
+        f.write(js)
 
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
@@ -157,24 +174,16 @@ else:
     # Applies theme to css
     css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
 
+    # Writing to files
     if customMode:
         while True:
             saveMode = input("[+] Save files in a [s]ingle file or [m]ultiple: ")
             if saveMode in ("single", "s"):
-                html = html.replace("[~css]", "<style>" + css + "</style>")
-                html = html.replace("[~script]", "<script>" + js + "</script>")
+                saveSingle(html, js, css)
                 break
             elif saveMode in ("multiple", "m"):
-                html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
-                html = html.replace("[~script]", '<script src="main.js"></script>')
+                saveMultiple(html, js, css)
                 break
-
-    # Write to output files
-    print("[+] Writing output files in ./output")
-    with open("./output/index.html", "w+") as f:
-        f.write(html)
-    with open("./output/main.css", "w+") as f:
-        f.write(css)
-    with open("./output/main.js", "w+") as f:
-        f.write(js)
+    else:
+        saveSingle(html, js, css)
     print("[+] Completed")
