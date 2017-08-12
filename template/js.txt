@@ -1,5 +1,5 @@
 var currentSlide = 0;
-// lastSlide declared in document
+var lastSlide = document.getElementsByClassName("slide").length - 1
 var progressBar = document.getElementById("progress");
 
 var slideShow = {

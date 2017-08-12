@@ -76,7 +76,7 @@ else:
             # Adds another point and puts the line in the content section
             html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
-    html = html.replace("[~slideCounter]", str(slideCounter - 2)).replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
+    html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
 
     print("[+] Successfully parsed input file")
 

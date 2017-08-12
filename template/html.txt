@@ -18,7 +18,6 @@ be added such as other scripts/styles.
           <p onclick="slideShow.next()">></p>
      </div>
      <div id="progress"></div>
-     <script>var lastSlide = [~slideCounter];</script>
      <script src="main.js"></script>
 </body>
 </html>
