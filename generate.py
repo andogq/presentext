@@ -47,6 +47,10 @@ def saveMultiple(html, js, css):
     with open("./output/main.js", "w+") as f:
         f.write(js)
 
+def generateRgb():
+    return [randint(0,255), randint(0,255), randint(0,255)]
+
+
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
     print("   -c: Custom mode. Gives options to change things like background color")
@@ -133,21 +137,39 @@ else:
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
-        backgroundColor = input("    [+] Pick a background color (basic color name or rgb value): ")
-        if backgroundColor in colors:
-            backgroundColor = colors[backgroundColor]
-        elif backgroundColor[:3] == "rgb":
-            try:
-                backgroundColor = [int(i) for i in backgroundColor[4:].split(" ") if (int(i) <= 255) and (int(i) >= 0)]
-            except:
-                print("    [+] Not a valid rgb value. Try 'rgb 123 123 123'")
-                backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
-        else:
-            print("    [+] Not a valid rgb value. Try 'rgb 123 123 123'")
-            backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
+        while True:
+            backgroundColor = input("    [+] Pick a background color (basic color name or rgb value or enter for random): ")
+            # A valid pre-known color
+            if backgroundColor in colors:
+                backgroundColor = colors[backgroundColor]
+                break
+            # Custom rgb color
+            elif backgroundColor[:3] == "rgb":
+                # No input
+                if backgroundColor == "":
+                    break
 
+                # Set to false if loop needs to be rerun
+                valid = True
+                try:
+                    backgroundColor = [int(i) for i in backgroundColor[4:].split(" ") if (int(i) <= 255) and (int(i) >= 0)]
+                except:
+                    valid = False
+                    print("    [+] Not a valid rgb value")
+                    backgroundColor = generateRgb()
+
+                if valid:
+                    break
+
+            # No input
+            elif backgroundColor == "":
+                backgroundColor = generateRgb()
+                break
+
+            else:
+                print("    [+] Not a valid rgb value")
     else:
-        backgroundColor = [randint(0,255), randint(0,255), randint(0,255)]
+        backgroundColor = generateRgb()
 
     # 383 = (255 * 3) / 2
     if sum(backgroundColor[0:len(backgroundColor)]) < 383:
