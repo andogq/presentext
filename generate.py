@@ -61,39 +61,16 @@ else:
             html = html.replace("[~title]", title)
             firstLine = False
 
-        # Slide title (automatically makes new slide)
+        # Slide heading (automatically makes new slide)
         if counter == 0:
-            if slideOpen:
-                if contentOpen:
-
-                    # Close content section
-                    slideContent += template["contentSection"].replace("[~contentSectionContent]", contentSectionContent + "[~contentSectionContent]")
-                    contentOpen = False
-
-                # Close slide
-                slide = template["slide"].replace("[~slideContent]", slideContent).replace("[~slideId]", str(slideCounter - 1)) + "[~slideSection]"
-                html = html.replace("[~slideSection]", slide)
-                slideOpen = False
-
-            # Create title and slide
-            heading = template["heading"].replace("[~headingContent]", line)
-            slideContent = heading + "[~slideContent]"
-            slideOpen = True
+            html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", template["slide"] + "[~slideSection]").replace("[~slideId]", str(slideCounter)).replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
             slideCounter += 1
 
         # Content type
         elif counter == 1:
-            if not contentOpen:
+            html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
-                # Create new content section
-                contentSectionContent = template["contentSection"]
-                contentOpen = True
-
-            # Add line to content section
-            contentSectionContent = template["content"].replace("[~contentContent]", line + "[~contentContent]")
-
-    # Get rid of placeholders
-    html = html.replace("[~slideContent]", "").replace("[~contentSectionContent]", "").replace("[~contentSection]", "").replace("[~contentContent]", "").replace("[~slideSection]", "").replace("[~slideCounter]", str(slideCounter - 2))
+    html = html.replace("[~slideCounter]", str(slideCounter - 2)).replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
 
     print("[+] Successfully parsed input file")
 
