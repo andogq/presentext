@@ -20,7 +20,8 @@ colors = {
 }
 
 if len(sys.argv) < 2:
-    print("Usage: {} [/path/to/file]".format(sys.argv[0]))
+    print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
+    print("   -c: Custom mode. Gives options to change things like background color")
 else:
     # If custom flag set it will leave options for custom changes
     if len(sys.argv) == 3:
