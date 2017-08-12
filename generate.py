@@ -19,6 +19,12 @@ colors = {
     "gray": [128, 128, 128]
 }
 
+# Stops the script if something is missing
+def checkFile(filePath):
+    if not os.path.exists(filePath):
+        print("[!] Missing file/directory or insufficent permissions: {}".format(filePath))
+        sys.exit()
+
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
     print("   -c: Custom mode. Gives options to change things like background color")
@@ -27,6 +33,13 @@ else:
     if len(sys.argv) == 3:
         if sys.argv[2] == "-c":
             customMode = True
+
+    # Checks for all the files required
+    print("[+] Checking if files exist")
+    checkFile(sys.argv[1])
+    checkFile("./template/html.txt")
+    checkFile("./template/css.txt")
+    checkFile("./template/js.txt")
 
     print("[+] Loading templates")
     # Opens template files
