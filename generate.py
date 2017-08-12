@@ -25,6 +25,7 @@ def checkFile(filePath):
         print("[!] Missing file/directory or insufficent permissions: {}".format(filePath))
         sys.exit()
 
+
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
     print("   -c: Custom mode. Gives options to change things like background color")
@@ -41,8 +42,8 @@ else:
     checkFile("./template/css.txt")
     checkFile("./template/js.txt")
 
-    print("[+] Loading templates")
     # Opens template files
+    print("[+] Loading templates")
     with open("./template/html.txt") as f:
         f = f.read()
         template["html"] = f.split("[~html]")[1]
@@ -50,18 +51,19 @@ else:
         template["heading"] = f.split("[~heading]")[1]
         template["contentSection"] = f.split("[~contentSection]")[1]
         template["content"] = f.split("[~content]")[1]
-
     print("[+] Loaded all templates")
 
+    # Holds the html file
     html = template["html"]
 
     firstLine = True
     slideCounter = 0
 
-    print("[-] Parsing input file")
     # Parses the input file
+    print("[+] Parsing input file")
     for line in fileinput.input(sys.argv[1]):
         line = list(line)
+
         # Finds where the "-" is, signifying what type of dot point it is
         for counter in range(len(line)):
             if line[counter] == "-":
@@ -74,7 +76,7 @@ else:
         line = "".join(line)[counter + 1:len(line) - 1].strip()
 
         if firstLine:
-            # Line type is a heading
+            # Line type is a title
             if counter == -1:
                 title = line
 
@@ -98,31 +100,14 @@ else:
             html = html.replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
             slideCounter += 1
 
-        # Content type
+        # Content
         elif counter == 1:
             # Adds another point and puts the line in the content section
             html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
+    # Removes extra placeholders
     html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
-
     print("[+] Successfully parsed input file")
-
-    # Checks for output directory and creates one if needed
-    if not os.path.exists("./output"):
-        print("[+] Output directory not found. Creating")
-        os.makedirs("./output")
-
-    # Write to output file
-    print("[+] Writing as './output/output.html'")
-    with open("./output/output.html", "w+") as f:
-        f.write(html)
-
-    # Save js and css files into output folder
-    print("[+] Opening css and js template files")
-    with open("./template/css.txt") as f:
-        css = f.read().split("[~]")
-    with open("./template/js.txt") as f:
-        js = f.read()
 
     print("[+] Generating theme")
     # Makes a rgb color
@@ -153,9 +138,25 @@ else:
 
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
 
+    # Checks for output directory and creates one if needed
+    if not os.path.exists("./output"):
+        print("[-] Output directory not found. Creating")
+        os.makedirs("./output")
+
+    # Save js and css files into output folder
+    print("[+] Opening css and js template files")
+    with open("./template/css.txt") as f:
+        css = f.read().split("[~]")
+    with open("./template/js.txt") as f:
+        js = f.read()
+
+    # Applies theme to css
     css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
 
-    print("[+] Writing css and js files")
+    # Write to output files
+    print("[+] Writing output files in ./output")
+    with open("./output/index.html", "w+") as f:
+        f.write(html)
     with open("./output/main.css", "w+") as f:
         f.write(css)
     with open("./output/main.js", "w+") as f:
