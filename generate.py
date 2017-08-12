@@ -4,11 +4,17 @@ import os
 from random import randint
 
 template = {}
+customMode = False
 
 if len(sys.argv) < 2:
     print("Usage: {} [/path/to/file]".format(sys.argv[0]))
 else:
-    print("[-] Loading templates")
+    # If custom flag set it will leave options for custom changes
+    if len(sys.argv) == 3:
+        if sys.argv[2] == "-c":
+            customMode = True
+
+    print("[+] Loading templates")
     # Opens template files
     with open("./template/html/html.txt") as f:
         template["html"] = f.read().split("[~]")
@@ -155,3 +161,6 @@ else:
     with open("./output/main.js", "w+") as f:
         f.write(js)
     print("[+] Completed")
+
+    if customMode:
+        print("Custom")
