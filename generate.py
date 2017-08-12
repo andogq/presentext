@@ -16,24 +16,17 @@ else:
 
     print("[+] Loading templates")
     # Opens template files
-    with open("./template/html/html.txt") as f:
-        template["html"] = f.read().split("[~]")
-
-    with open("./template/html/slide.txt") as f:
-        template["slide"] = f.read().split("[~]")
-
-    with open("./template/html/heading.txt") as f:
-        template["heading"] = f.read().split("[~]")
-
-    with open("./template/html/contentSection.txt") as f:
-        template["contentSection"] = f.read().split("[~]")
-
-    with open("./template/html/content.txt") as f:
-        template["content"] = f.read().split("[~]")
+    with open("./template/html.txt") as f:
+        f = f.read()
+        template["html"] = f.split("[~html]")[1]
+        template["slide"] = f.split("[~slide]")[1]
+        template["heading"] = f.split("[~heading]")[1]
+        template["contentSection"] = f.split("[~contentSection]")[1]
+        template["content"] = f.split("[~content]")[1]
 
     print("[+] Loaded all templates")
 
-    html = template["html"][0]
+    html = template["html"]
 
     firstLine = True
     slideOpen = False
@@ -58,11 +51,12 @@ else:
         if firstLine:
             # Line type is a heading
             if counter == -1:
-                html += line + template["html"][1]
+                title = line
 
             # No heading supplied
             else:
-                html += "Presentation" + template["html"][1]
+                title = "Presentation"
+            html = html.replace("[~title]", title)
             firstLine = False
 
         # Slide title (automatically makes new slide)

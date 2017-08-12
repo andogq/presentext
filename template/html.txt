@@ -1,0 +1,41 @@
+Template file. Placeholders are signified with '[~word]' but anything else can
+be added such as other scripts/styles.
+
+[~html]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UFT-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <title>[~title]</title>
+     <link href="main.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+     [~slideSection]
+     <div id="controls">
+          <p onclick="slideShow.prev()"><</p>
+          <p onclick="slideShow.next()">></p>
+     </div>
+     <div id="progress"></div>
+     <script>var lastSlide = [~slideCounter];</script>
+     <script src="main.js"></script>
+</body>
+</html>
+[~html]
+
+[~slide]
+<div class="slide offScreen" id="slide[~slideId]">[~slideContent]</div>
+[~slide]
+
+[~heading]
+<h1>[~headingContent]</h1>
+[~heading]
+
+[~contentSection]
+<ul>[~contentSectionContent]</ul>
+[~contentSection]
+
+[~content]
+<li>[~contentContent]</li>
+[~content]
