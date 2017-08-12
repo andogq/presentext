@@ -50,7 +50,6 @@ def saveMultiple(html, js, css):
 def generateRgb():
     return [randint(0,255), randint(0,255), randint(0,255)]
 
-
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
     print("   -c: Custom mode. Gives options to change things like background color")

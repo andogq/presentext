@@ -31,8 +31,6 @@ var slideShow = {
      }
 }
 
-
-var body = document.body;
 function userInteraction(event) {
     if (event.type == "click") {
         slideShow.next();
@@ -42,16 +40,6 @@ function userInteraction(event) {
         } else if (event.key == "ArrowLeft") {
              slideShow.prev();
         }
-    }
-
-    if (body.requestFullscreen) {
-        body.requestFullscreen();
-    } else if (body.webkitRequestFullscreen) {
-        body.webkitRequestFullscreen();
-    } else if (body.mozRequestFullScreen) {
-        body.mozRequestFullScreen();
-    } else if (body.msRequestFullscreen) {
-        body.msRequestFullscreen();
     }
 }
 
