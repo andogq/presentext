@@ -2,6 +2,7 @@ import sys
 import fileinput
 import os
 from random import randint
+from shutil import copyfile
 
 template = {}
 customMode = False
@@ -20,9 +21,9 @@ colors = {
 }
 
 # Stops the script if something is missing
-def checkFile(filePath):
-    if not os.path.exists(filePath):
-        print("[!] Missing file/directory or insufficent permissions: {}".format(filePath))
+def checkPath(path):
+    if not os.path.exists(path):
+        print("[!] Missing file/directory or insufficent permissions: {}".format(path))
         sys.exit()
 
 # Returns the substring between two placeholders
@@ -61,10 +62,15 @@ else:
 
     # Checks for all the files required
     print("[+] Checking if files exist")
-    checkFile(sys.argv[1])
-    checkFile("./template/html.txt")
-    checkFile("./template/css.txt")
-    checkFile("./template/js.txt")
+    checkPath(sys.argv[1])
+    checkPath("./template/html.txt")
+    checkPath("./template/css.txt")
+    checkPath("./template/js.txt")
+
+    # Checks for output directory and creates one if needed
+    if not os.path.exists("./output"):
+        print("[-] Output directory not found. Creating")
+        os.makedirs("./output")
 
     # Opens template files
     print("[+] Loading templates")
@@ -133,6 +139,23 @@ else:
     html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
     print("[+] Successfully parsed input file")
 
+    if customMode:
+        while True:
+            imagePath = input("[+] Image path for background (blank for none): ")
+            if imagePath != "":
+                if os.path.exists(imagePath):
+                    html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
+                    print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
+                    copyfile(imagePath, "./output/background.jpg")
+                    break
+                else:
+                    print("    [!] Image doesn't exist or invalid permissions")
+            # User inputted nothing
+            else:
+                break
+    # Removes the background placeholder regardless of current mode
+    html = html.replace("[~background]", "")
+
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
@@ -154,7 +177,7 @@ else:
                     backgroundColor = [int(i) for i in backgroundColor[4:].split(" ") if (int(i) <= 255) and (int(i) >= 0)]
                 except:
                     valid = False
-                    print("    [+] Not a valid rgb value")
+                    print("    [-] Not a valid rgb value")
                     backgroundColor = generateRgb()
 
                 if valid:
@@ -166,9 +189,22 @@ else:
                 break
 
             else:
-                print("    [+] Not a valid rgb value")
+                print("    [-] Not a valid rgb value")
+
+        # Setting opacity for background
+        while True:
+            try:
+                opacity = float(input("    [+] Opacity for background (between 0-1. Default 1): "))
+            except:
+                opacity = 1
+
+            if opacity >= 0 and opacity <= 1:
+                break
+            else:
+                print("        [-] Not a number between 0-1")
     else:
         backgroundColor = generateRgb()
+        opacity = 1
 
     # 383 = (255 * 3) / 2
     if sum(backgroundColor[0:len(backgroundColor)]) < 383:
@@ -176,14 +212,9 @@ else:
     else:
         textColor = "black"
 
-    backgroundColor = "rgb(" + str(backgroundColor)[1:-1] + ")"
+    backgroundColor = "rgba(" + str(backgroundColor)[1:-1] + ", " + str(opacity) + ")"
 
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
-
-    # Checks for output directory and creates one if needed
-    if not os.path.exists("./output"):
-        print("[-] Output directory not found. Creating")
-        os.makedirs("./output")
 
     # Save js and css files into output folder
     print("[+] Opening css and js template files")
@@ -198,8 +229,8 @@ else:
     # Writing to files
     if customMode:
         while True:
-            saveMode = input("[+] Save files in a [s]ingle file or [m]ultiple: ")
-            if saveMode in ("single", "s"):
+            saveMode = input("[+] Save files in a [s]ingle file or [m]ultiple (blank for single): ")
+            if saveMode in ("single", "s", ""):
                 saveSingle(html, js, css)
                 break
             elif saveMode in ("multiple", "m"):

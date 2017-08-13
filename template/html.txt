@@ -13,6 +13,7 @@ be added such as other scripts/styles.
 </head>
 <body>
      [~slideSection]
+     [~background]
      <div id="left" onclick="slideShow.prev()"></div>
      <div id="right" onclick="slideShow.next()"></div>
      <div id="controls">
