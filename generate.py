@@ -30,6 +30,7 @@ def checkPath(path):
 def extractString(string, placeholder):
     return string.split(placeholder)[1]
 
+# Saves all the files in one file
 def saveSingle(html, js, css):
     print("[+] Writing to ./output/index.html")
     html = html.replace("[~css]", "<style>" + css + "</style>")
@@ -37,6 +38,7 @@ def saveSingle(html, js, css):
     with open("./output/index.html", "w+") as f:
         f.write(html)
 
+# Splits the files up into each language
 def saveMultiple(html, js, css):
     print("[+] Writing to files in ./output")
     html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
@@ -48,50 +50,46 @@ def saveMultiple(html, js, css):
     with open("./output/main.js", "w+") as f:
         f.write(js)
 
+# Returns a random RGB color
 def generateRgb():
     return [randint(0,255), randint(0,255), randint(0,255)]
 
-if len(sys.argv) < 2:
-    print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
-    print("   -c: Custom mode. Gives options to change things like background color")
-else:
-    # If custom flag set it will leave options for custom changes
-    if len(sys.argv) == 3:
-        if sys.argv[2] == "-c":
-            customMode = True
-
-    # Checks for all the files required
+# Checks for all the files and folders required
+def checkFiles():
     print("[+] Checking if files exist")
     checkPath(sys.argv[1])
     checkPath("./template/html.txt")
     checkPath("./template/css.txt")
     checkPath("./template/js.txt")
-
     # Checks for output directory and creates one if needed
     if not os.path.exists("./output"):
         print("[-] Output directory not found. Creating")
         os.makedirs("./output")
 
-    # Opens template files
+# Opens template files
+def loadTemplate(file):
     print("[+] Loading templates")
-    with open("./template/html.txt") as f:
+    returnTemplate = {}
+    with open(file) as f:
         f = f.read()
-        template["html"] = extractString(f, "[~html]")
-        template["slide"] = extractString(f, "[~slide]")
-        template["heading"] = extractString(f, "[~heading]")
-        template["contentSection"] = extractString(f, "[~contentSection]")
-        template["content"] = extractString(f, "[~content]")
+        returnTemplate["html"] = extractString(f, "[~html]")
+        returnTemplate["slide"] = extractString(f, "[~slide]")
+        returnTemplate["heading"] = extractString(f, "[~heading]")
+        returnTemplate["contentSection"] = extractString(f, "[~contentSection]")
+        returnTemplate["content"] = extractString(f, "[~content]")
     print("[+] Loaded all templates")
+    return returnTemplate
+
+# Parses the input file
+def parseInput(inputFile, template):
+    print("[+] Parsing input file")
 
     # Holds the html file
-    html = template["html"]
-
+    parsedFile = template["html"]
     firstLine = True
     slideCounter = 0
 
-    # Parses the input file
-    print("[+] Parsing input file")
-    for line in fileinput.input(sys.argv[1]):
+    for line in fileinput.input(inputFile):
         line = list(line)
 
         # Finds where the "-" is, signifying what type of dot point it is
@@ -115,47 +113,54 @@ else:
                 title = "Presentation"
 
             # Puts the heading in the page
-            html = html.replace("[~title]", title)
+            parsedFile = parsedFile.replace("[~title]", title)
             firstLine = False
 
         # Slide heading (automatically makes new slide)
         if counter == 0:
             # Clears tags from previous slide
-            html = html.replace("[~contentSectionContent]", "")
+            parsedFile = parsedFile.replace("[~contentSectionContent]", "")
             # Adds a new slide
-            html = html.replace("[~slideSection]", template["slide"] + "[~slideSection]")
+            parsedFile = parsedFile.replace("[~slideSection]", template["slide"] + "[~slideSection]")
             # Puts in slide ID
-            html = html.replace("[~slideId]", str(slideCounter))
+            parsedFile = parsedFile.replace("[~slideId]", str(slideCounter))
             # Adds a heading to the slide and adds the ul element to house the points
-            html = html.replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
+            parsedFile = parsedFile.replace("[~slideContent]", template["heading"].replace("[~headingContent]", line) + template["contentSection"])
             slideCounter += 1
 
         # Content
         elif counter == 1:
             # Adds another point and puts the line in the content section
-            html = html.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
+            parsedFile = parsedFile.replace("[~contentSectionContent]", template["content"] + "[~contentSectionContent]").replace("[~contentContent]", line)
 
-    # Removes extra placeholders
-    html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "")
     print("[+] Successfully parsed input file")
+    return parsedFile
 
-    if customMode:
-        while True:
-            imagePath = input("[+] Image path for background (blank for none): ")
-            if imagePath != "":
-                if os.path.exists(imagePath):
-                    html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
-                    print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
-                    copyfile(imagePath, "./output/background.jpg")
-                    break
-                else:
-                    print("    [!] Image doesn't exist or invalid permissions")
-            # User inputted nothing
-            else:
+# Adds a background image
+def setBackground(html):
+    while True:
+        imagePath = input("[+] Image path for background (blank for none): ")
+        if imagePath != "":
+            if os.path.exists(imagePath):
+                html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
+                print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
+                copyfile(imagePath, "./output/background.jpg")
                 break
-    # Removes the background placeholder regardless of current mode
-    html = html.replace("[~background]", "")
+            else:
+                print("    [!] Image doesn't exist or invalid permissions")
+        # User inputted nothing
+        else:
+            break
+    return html
 
+# Removes all the placeholders
+def removePlaceholder(html):
+    return html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "")
+
+# Generates either a random or custom theme depending on customMode
+def generateTheme(css):
+    global customMode
+    global colors
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
@@ -211,20 +216,42 @@ else:
         textColor = "white"
     else:
         textColor = "black"
-
     backgroundColor = "rgba(" + str(backgroundColor)[1:-1] + ", " + str(opacity) + ")"
-
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
-
-    # Save js and css files into output folder
-    print("[+] Opening css and js template files")
-    with open("./template/css.txt") as f:
-        css = f.read().split("[~]")
-    with open("./template/js.txt") as f:
-        js = f.read()
 
     # Applies theme to css
     css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
+
+    return css
+
+def loadFile(file):
+    with open(file) as f:
+        return f.read()
+
+if len(sys.argv) < 2:
+    print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
+    print("   -c: Custom mode. Gives options to change things like background color")
+else:
+    # If custom flag set it will leave options for custom changes
+    if len(sys.argv) == 3:
+        if sys.argv[2] == "-c":
+            customMode = True
+
+    checkFiles()
+    template = loadTemplate("./template/html.txt")
+    print("[+] Opening css and js template files")
+    css = loadFile("./template/css.txt").split("[~]")
+    js = loadFile("./template/js.txt")
+
+    # Parses the input file
+    html = parseInput(sys.argv[1], template)
+
+    if customMode:
+        html = setBackground(html)
+
+    html = removePlaceholder(html)
+
+    css = generateTheme(css)
 
     # Writing to files
     if customMode:
