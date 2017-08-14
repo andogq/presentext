@@ -19,6 +19,8 @@ colors = {
     "gray": [128, 128, 128]
 }
 
+template = {}
+
 # Keeps prompting for response until valid response
 def getInput(prompt, allowed):
     while True:
@@ -42,20 +44,22 @@ def saveFile(filePath, content):
         f.write(content)
 
 # Saves all the files in one file
-def saveSingle(htmlContent, jsContent, cssContent):
+def saveSingle():
+    global html, css, js
     print("[+] Writing to ./output/index.html")
-    htmlContent = htmlContent.replace("[~css]", "<style>" + cssContent + "</style>")
-    htmlContent = htmlContent.replace("[~script]", "<script>" + jsContent + "</script>")
-    saveFile("./output/index.html", htmlContent)
+    html = html.replace("[~css]", "<style>" + css + "</style>")
+    html = html.replace("[~script]", "<script>" + js + "</script>")
+    saveFile("./output/index.html", html)
 
 # Splits the files up into each language
-def saveMultiple(htmlContent, jsContent, cssContent):
+def saveMultiple():
+    global html, css, js
     print("[+] Writing to files in ./output")
-    htmlContent = htmlContent.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
-    htmlContent = htmlContent.replace("[~script]", '<script src="main.js"></script>')
-    saveFile("./output/index.html", htmlContent)
-    saveFile("./output/main.css", cssContent)
-    saveFile("./output/main.js", jsContent)
+    html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
+    html = html.replace("[~script]", '<script src="main.js"></script>')
+    saveFile("./output/index.html", html)
+    saveFile("./output/main.css", css)
+    saveFile("./output/main.js", js)
 
 # Returns a random RGB color
 def generateRgb():
@@ -76,7 +80,7 @@ def checkFiles():
 # Opens template files
 def loadTemplate(templateFile):
     print("[+] Loading templates")
-    template = {}
+    global template
     with open(templateFile) as f:
         f = f.read()
         template["html"] = extractString(f, "[~html]")
@@ -86,18 +90,17 @@ def loadTemplate(templateFile):
         template["content"] = extractString(f, "[~content]")
         template["controls"] = extractString(f, "[~controlSection]")
     print("[+] Loaded all templates")
-    return template
 
 # Parses the input file
-def parseInputFile(inputFile, template):
+def parseInputFile(inputFilePath):
+    global template
     print("[+] Parsing input file")
-
     # Holds the html file
     parsedFile = template["html"]
     firstLine = True
     slideCounter = 0
 
-    for line in fileinput.input(inputFile):
+    for line in fileinput.input(inputFilePath):
         line = list(line)
 
         # Finds where the "-" is, signifying what type of dot point it is
@@ -145,12 +148,13 @@ def parseInputFile(inputFile, template):
     return parsedFile
 
 # Adds a background image
-def setImageBackground(htmlContent):
+def setImageBackground():
+    global html
     while True:
         imagePath = input("[+] Image path for background (blank for none): ")
         if imagePath != "":
             if os.path.exists(imagePath):
-                htmlContent = htmlContent.replace("[~background]", '<img id="background" src="background.jpg"/>')
+                html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
                 print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
                 copyfile(imagePath, "./output/background.jpg")
                 break
@@ -159,11 +163,11 @@ def setImageBackground(htmlContent):
         # User inputted nothing
         else:
             break
-    return htmlContent
 
 # Removes all the placeholders
-def removePlaceholder(htmlContent):
-    return htmlContent.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "").replace("[~controls]", "")
+def removePlaceholder():
+    global html
+    html = html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "").replace("[~controls]", "")
 
 def determineTextColor(backgroundColor):
     # 383 = (255 * 3) / 2
@@ -174,10 +178,8 @@ def determineTextColor(backgroundColor):
     return textColor
 
 # Generates either a random or custom theme depending on customMode
-def generateTheme(cssContent):
-    global customMode
-    global colors
-    global html
+def generateTheme():
+    global customMode, colors, html, css
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
@@ -238,15 +240,15 @@ def generateTheme(cssContent):
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
 
     # Applies theme to css
-    return cssContent[0] + textColor + cssContent[1] + backgroundColor + cssContent[2] + textColor + cssContent[3]
+    css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
 
 def loadFile(filePath):
     with open(filePath) as f:
         return f.read()
 
-def addControls(htmlContent, template):
-    htmlContent = htmlContent.replace("[~controls]", template["controls"])
-    return htmlContent
+def addControls():
+    global html, template
+    html = html.replace("[~controls]", template["controls"])
 
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
@@ -258,34 +260,34 @@ else:
             customMode = True
 
     checkFiles()
-    template = loadTemplate("./template/html.txt")
+    loadTemplate("./template/html.txt")
     print("[+] Opening css and js template files")
     css = loadFile("./template/css.txt").split("[~]")
     js = loadFile("./template/js.txt")
 
     # Parses the input file
-    html = parseInputFile(sys.argv[1], template)
+    html = parseInputFile(sys.argv[1])
 
     if customMode:
         # Add controls
         controls = getInput("[+] Add controls to bottom of page? Y/n (default n): ", ("Y", "y", "N", "n", ""))
         if controls in ("Y", "y"):
             print("    [+] Adding controls")
-            html = addControls(html, template)
+            addControls()
 
-        html = setImageBackground(html)
+        setImageBackground()
 
-    html = removePlaceholder(html)
+    removePlaceholder()
 
-    css = generateTheme(css)
+    generateTheme()
 
     # Writing to files
     if customMode:
         saveMode = getInput("[+] Save files in a [s]ingle file or [m]ultiple (blank for single): ", ("s", "S", "m", "M", ""))
         if saveMode in ("single", "s", ""):
-            saveSingle(html, js, css)
+            saveSingle()
         elif saveMode in ("multiple", "m"):
-            saveMultiple(html, js, css)
+            saveMultiple()
     else:
-        saveSingle(html, js, css)
+        saveSingle()
     print("[+] Completed")
