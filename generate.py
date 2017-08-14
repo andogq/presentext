@@ -6,6 +6,8 @@ from shutil import copyfile
 
 customMode = False
 
+backgroundAdded = False
+
 colors = {
     "red": [255, 0, 0],
     "pink": [255, 193, 203],
@@ -148,21 +150,12 @@ def parseInputFile(inputFilePath):
     return parsedFile
 
 # Adds a background image
-def setImageBackground():
-    global html
-    while True:
-        imagePath = input("[+] Image path for background (blank for none): ")
-        if imagePath != "":
-            if os.path.exists(imagePath):
-                html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
-                print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
-                copyfile(imagePath, "./output/background.jpg")
-                break
-            else:
-                print("    [!] Image doesn't exist or invalid permissions")
-        # User inputted nothing
-        else:
-            break
+def setImageBackground(imagePath):
+    global html, backgroundAdded
+    html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
+    print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
+    copyfile(imagePath, "./output/background.jpg")
+    backgroundAdded = True
 
 # Removes all the placeholders
 def removePlaceholder():
@@ -217,7 +210,7 @@ def generateTheme():
                 print("    [-] Not a valid rgb value")
 
         # Setting opacity for background
-        if ('<img id="background"' in html):
+        if '<img id="background"' in html:
             defaultOpacity = 0.4
         else:
             defaultOpacity = 1
@@ -234,7 +227,10 @@ def generateTheme():
                 print("        [-] Not a number between 0-1")
     else:
         backgroundColor = generateRgb()
-        opacity = 1
+        if '<img id="background"' in html:
+            opacity = 0.4
+        else:
+            opacity = 1
     textColor = determineTextColor(backgroundColor)
     backgroundColor = "rgba(" + str(backgroundColor)[1:-1] + ", " + str(opacity) + ")"
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
@@ -275,7 +271,21 @@ else:
             print("    [+] Adding controls")
             addControls()
 
-        setImageBackground()
+        while True:
+            imagePath = input("[+] Image path for background (blank for background.jpg or none): ")
+            if imagePath != "":
+                if os.path.exists(imagePath):
+                    setImageBackground(imagePath)
+                    break
+                else:
+                    print("    [!] Image doesn't exist or invalid permissions")
+            # User inputted nothing
+            else:
+                break
+    if not backgroundAdded:
+        if os.path.exists("background.jpg"):
+            print("[+] background.jpg found in current folder")
+            setImageBackground("background.jpg")
 
     removePlaceholder()
 
