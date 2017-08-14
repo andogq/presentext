@@ -19,6 +19,13 @@ colors = {
     "gray": [128, 128, 128]
 }
 
+# Keeps prompting for response until valid response
+def getInput(prompt, allowed):
+    while True:
+        userInput = input(prompt)
+        if userInput in allowed:
+            return userInput
+
 # Stops the script if something is missing
 def checkPath(path):
     if not os.path.exists(path):
@@ -173,6 +180,7 @@ def generateTheme(cssContent):
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
+        # Not using getInput function because of custom rules
         while True:
             backgroundColor = input("    [+] Pick a background color (basic color name or rgb value or enter for random): ")
             # A valid pre-known color
@@ -210,6 +218,7 @@ def generateTheme(cssContent):
             defaultOpacity = 0.4
         else:
             defaultOpacity = 1
+        # Not using getInput function because of custom rules
         while True:
             try:
                 opacity = float(input("    [+] Opacity for background (between 0-1. Default {}): ".format(defaultOpacity)))
@@ -257,14 +266,12 @@ else:
     html = parseInputFile(sys.argv[1], template)
 
     if customMode:
+        # Add controls
+        controls = getInput("[+] Add controls to bottom of page? Y/n (default n): ", ("Y", "y", "N", "n", ""))
+        if controls in ("Y", "y"):
+            print("    [+] Adding controls")
+            html = addControls(html)
 
-        while True:
-            controls = input("[+] Add controls to bottom of page? Y/n (default n): ")
-            if controls in ("Y", "y"):
-                print("    [+] Adding controls")
-                html = addControls(html)
-            elif controls in ("N", "n", ""):
-                break
         html = setImageBackground(html)
 
     html = removePlaceholder(html)
@@ -273,14 +280,11 @@ else:
 
     # Writing to files
     if customMode:
-        while True:
-            saveMode = input("[+] Save files in a [s]ingle file or [m]ultiple (blank for single): ")
-            if saveMode in ("single", "s", ""):
-                saveSingle(html, js, css)
-                break
-            elif saveMode in ("multiple", "m"):
-                saveMultiple(html, js, css)
-                break
+        saveMode = getInput("[+] Save files in a [s]ingle file or [m]ultiple (blank for single): ", ("s", "S", "m", "M", ""))
+        if saveMode in ("single", "s", ""):
+            saveSingle(html, js, css)
+        elif saveMode in ("multiple", "m"):
+            saveMultiple(html, js, css)
     else:
         saveSingle(html, js, css)
     print("[+] Completed")
