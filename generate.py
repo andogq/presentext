@@ -4,7 +4,6 @@ import os
 from random import randint
 from shutil import copyfile
 
-template = {}
 customMode = False
 
 colors = {
@@ -31,25 +30,25 @@ def extractString(string, placeholder):
     return string.split(placeholder)[1]
 
 # Saves a files
-def saveFile(file, content):
-    with open(file, "w+") as f:
+def saveFile(filePath, content):
+    with open(filePath, "w+") as f:
         f.write(content)
 
 # Saves all the files in one file
-def saveSingle(html, js, css):
+def saveSingle(htmlContent, jsContent, cssContent):
     print("[+] Writing to ./output/index.html")
-    html = html.replace("[~css]", "<style>" + css + "</style>")
-    html = html.replace("[~script]", "<script>" + js + "</script>")
-    saveFile("./output/index.html", html)
+    htmlContent = htmlContent.replace("[~css]", "<style>" + cssContent + "</style>")
+    htmlContent = htmlContent.replace("[~script]", "<script>" + jsContent + "</script>")
+    saveFile("./output/index.html", htmlContent)
 
 # Splits the files up into each language
-def saveMultiple(html, js, css):
+def saveMultiple(htmlContent, jsContent, cssContent):
     print("[+] Writing to files in ./output")
-    html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
-    html = html.replace("[~script]", '<script src="main.js"></script>')
-    saveFile("./output/index.html", html)
-    saveFile("./output/main.css", css)
-    saveFile("./output/main.js", js)
+    htmlContent = htmlContent.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
+    htmlContent = htmlContent.replace("[~script]", '<script src="main.js"></script>')
+    saveFile("./output/index.html", htmlContent)
+    saveFile("./output/main.css", cssContent)
+    saveFile("./output/main.js", jsContent)
 
 # Returns a random RGB color
 def generateRgb():
@@ -57,7 +56,7 @@ def generateRgb():
 
 # Checks for all the files and folders required
 def checkFiles():
-    print("[+] Checking if files exist")
+    print("[+] Checking if includes exist")
     checkPath(sys.argv[1])
     checkPath("./template/html.txt")
     checkPath("./template/css.txt")
@@ -68,21 +67,21 @@ def checkFiles():
         os.makedirs("./output")
 
 # Opens template files
-def loadTemplate(file):
+def loadTemplate(templateFile):
     print("[+] Loading templates")
-    returnTemplate = {}
-    with open(file) as f:
+    template = {}
+    with open(templateFile) as f:
         f = f.read()
-        returnTemplate["html"] = extractString(f, "[~html]")
-        returnTemplate["slide"] = extractString(f, "[~slide]")
-        returnTemplate["heading"] = extractString(f, "[~heading]")
-        returnTemplate["contentSection"] = extractString(f, "[~contentSection]")
-        returnTemplate["content"] = extractString(f, "[~content]")
+        template["html"] = extractString(f, "[~html]")
+        template["slide"] = extractString(f, "[~slide]")
+        template["heading"] = extractString(f, "[~heading]")
+        template["contentSection"] = extractString(f, "[~contentSection]")
+        template["content"] = extractString(f, "[~content]")
     print("[+] Loaded all templates")
-    return returnTemplate
+    return template
 
 # Parses the input file
-def parseInput(inputFile, template):
+def parseInputFile(inputFile, template):
     print("[+] Parsing input file")
 
     # Holds the html file
@@ -138,12 +137,12 @@ def parseInput(inputFile, template):
     return parsedFile
 
 # Adds a background image
-def setBackground(html):
+def setImageBackground(htmlContent):
     while True:
         imagePath = input("[+] Image path for background (blank for none): ")
         if imagePath != "":
             if os.path.exists(imagePath):
-                html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
+                htmlContent = htmlContent.replace("[~background]", '<img id="background" src="background.jpg"/>')
                 print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
                 copyfile(imagePath, "./output/background.jpg")
                 break
@@ -152,16 +151,25 @@ def setBackground(html):
         # User inputted nothing
         else:
             break
-    return html
+    return htmlContent
 
 # Removes all the placeholders
-def removePlaceholder(html):
-    return html.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "")
+def removePlaceholder(htmlContent):
+    return htmlContent.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "")
+
+def determineTextColor(backgroundColor):
+    # 383 = (255 * 3) / 2
+    if sum(backgroundColor[0:len(backgroundColor)]) < 383:
+        textColor = "white"
+    else:
+        textColor = "black"
+    return textColor
 
 # Generates either a random or custom theme depending on customMode
-def generateTheme(css):
+def generateTheme(cssContent):
     global customMode
     global colors
+    global html
     print("[+] Generating theme")
     # Makes a rgb color
     if customMode:
@@ -198,11 +206,15 @@ def generateTheme(css):
                 print("    [-] Not a valid rgb value")
 
         # Setting opacity for background
+        if ('<img id="background"' in html):
+            defaultOpacity = 0.4
+        else:
+            defaultOpacity = 1
         while True:
             try:
-                opacity = float(input("    [+] Opacity for background (between 0-1. Default 1): "))
+                opacity = float(input("    [+] Opacity for background (between 0-1. Default {}): ".format(defaultOpacity)))
             except:
-                opacity = 1
+                opacity = defaultOpacity
 
             if opacity >= 0 and opacity <= 1:
                 break
@@ -211,22 +223,15 @@ def generateTheme(css):
     else:
         backgroundColor = generateRgb()
         opacity = 1
-
-    # 383 = (255 * 3) / 2
-    if sum(backgroundColor[0:len(backgroundColor)]) < 383:
-        textColor = "white"
-    else:
-        textColor = "black"
+    textColor = determineTextColor(backgroundColor)
     backgroundColor = "rgba(" + str(backgroundColor)[1:-1] + ", " + str(opacity) + ")"
     print("    [+] Using " + backgroundColor + " with " + textColor + " text")
 
     # Applies theme to css
-    css = css[0] + textColor + css[1] + backgroundColor + css[2] + textColor + css[3]
+    return cssContent[0] + textColor + cssContent[1] + backgroundColor + cssContent[2] + textColor + cssContent[3]
 
-    return css
-
-def loadFile(file):
-    with open(file) as f:
+def loadFile(filePath):
+    with open(filePath) as f:
         return f.read()
 
 if len(sys.argv) < 2:
@@ -245,10 +250,10 @@ else:
     js = loadFile("./template/js.txt")
 
     # Parses the input file
-    html = parseInput(sys.argv[1], template)
+    html = parseInputFile(sys.argv[1], template)
 
     if customMode:
-        html = setBackground(html)
+        html = setImageBackground(html)
 
     html = removePlaceholder(html)
 
