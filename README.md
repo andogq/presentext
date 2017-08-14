@@ -3,8 +3,8 @@ A Python script which when given a text file and a template, will generate a col
 ## Getting started
 The easiest way to run the script is to clone the repo or download the zip. Make sure Python 3.x is installed (untested on Python 2.x).
 ```
-git clone https://github.com/tom-ando/Presentation.git
-cd ./Presentation
+git clone https://github.com/tom-ando/presentext.git
+cd ./presentext
 python3 ./generate.py test.txt
 ```
 The final file can be found in `./output/index.html`. This file can be sent off or moved and needs no dependencies other than itself.
