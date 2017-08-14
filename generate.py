@@ -30,25 +30,26 @@ def checkPath(path):
 def extractString(string, placeholder):
     return string.split(placeholder)[1]
 
+# Saves a files
+def saveFile(file, content):
+    with open(file, "w+") as f:
+        f.write(content)
+
 # Saves all the files in one file
 def saveSingle(html, js, css):
     print("[+] Writing to ./output/index.html")
     html = html.replace("[~css]", "<style>" + css + "</style>")
     html = html.replace("[~script]", "<script>" + js + "</script>")
-    with open("./output/index.html", "w+") as f:
-        f.write(html)
+    saveFile("./output/index.html", html)
 
 # Splits the files up into each language
 def saveMultiple(html, js, css):
     print("[+] Writing to files in ./output")
     html = html.replace("[~css]", '<link rel="stylesheet" type="text/css" href="main.css"/>')
     html = html.replace("[~script]", '<script src="main.js"></script>')
-    with open("./output/index.html", "w+") as f:
-        f.write(html)
-    with open("./output/main.css", "w+") as f:
-        f.write(css)
-    with open("./output/main.js", "w+") as f:
-        f.write(js)
+    saveFile("./output/index.html", html)
+    saveFile("./output/main.css", css)
+    saveFile("./output/main.js", js)
 
 # Returns a random RGB color
 def generateRgb():
