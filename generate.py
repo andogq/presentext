@@ -3,6 +3,7 @@ import fileinput
 import os
 from random import randint
 from shutil import copyfile
+from base64 import b64encode
 
 customMode = False
 
@@ -22,6 +23,12 @@ colors = {
 }
 
 template = {}
+
+# Returns a base64 string of an image
+def encodeImage(imagePath):
+    print("[+] Encoding image from {}".format(imagePath))
+    with open(imagePath, "rb") as f:
+        return "data:image/jpeg;base64," + str(b64encode(f.read()))[2:-1]
 
 # Keeps prompting for response until valid response
 def getInput(prompt, allowed):
@@ -152,9 +159,19 @@ def parseInputFile(inputFilePath):
 # Adds a background image
 def setImageBackground(imagePath):
     global html, backgroundAdded
-    html = html.replace("[~background]", '<img id="background" src="background.jpg"/>')
-    print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
-    copyfile(imagePath, "./output/background.jpg")
+    if customMode:
+        while True:
+            imageMode = input("    [+] Have images [s]eperate or in [f]ile (default in file): ")
+            if imageMode in ("f", "F", ""):
+                imagePath = encodeImage(imagePath)
+                break
+            elif imageMode in ("s", "S"):
+                print("    [+] Copying image from {} to ./output/background.jpg".format(imagePath))
+                copyfile(imagePath, "./output/background.jpg")
+                break
+    else:
+        imagePath = encodeImage(imagePath)
+    html = html.replace("[~background]", '<img id="background" src="' + imagePath + '"/>')
     backgroundAdded = True
 
 # Removes all the placeholders
