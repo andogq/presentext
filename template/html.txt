@@ -16,10 +16,7 @@ be added such as other scripts/styles.
      [~background]
      <div id="left" onclick="slideShow.prev()"></div>
      <div id="right" onclick="slideShow.next()"></div>
-     <div id="controls">
-          <p onclick="slideShow.prev()"><</p>
-          <p onclick="slideShow.next()">></p>
-     </div>
+     [~controls]
      <div id="progress"></div>
      [~script]
 </body>
@@ -41,3 +38,10 @@ be added such as other scripts/styles.
 [~content]
 <li>[~contentContent]</li>
 [~content]
+
+[~controlSection]
+<div id="controls">
+     <p onclick="slideShow.prev()"><</p>
+     <p onclick="slideShow.next()">></p>
+</div>
+[~controlSection]

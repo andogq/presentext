@@ -155,7 +155,7 @@ def setImageBackground(htmlContent):
 
 # Removes all the placeholders
 def removePlaceholder(htmlContent):
-    return htmlContent.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "")
+    return htmlContent.replace("[~contentSectionContent]", "").replace("[~slideSection]", "").replace("[~background]", "").replace("[~controls]", "")
 
 def determineTextColor(backgroundColor):
     # 383 = (255 * 3) / 2
@@ -234,6 +234,10 @@ def loadFile(filePath):
     with open(filePath) as f:
         return f.read()
 
+def addControls(htmlContent):
+    htmlContent = htmlContent.replace("[~controls]", extractString("[~controlSection]"))
+    return htmlContent
+
 if len(sys.argv) < 2:
     print("Usage: {} /path/to/file [-c]".format(sys.argv[0]))
     print("   -c: Custom mode. Gives options to change things like background color")
@@ -253,6 +257,14 @@ else:
     html = parseInputFile(sys.argv[1], template)
 
     if customMode:
+
+        while True:
+            controls = input("[+] Add controls to bottom of page? Y/n (default n): ")
+            if controls in ("Y", "y"):
+                print("    [+] Adding controls")
+                html = addControls(html)
+            elif controls in ("N", "n", ""):
+                break
         html = setImageBackground(html)
 
     html = removePlaceholder(html)
