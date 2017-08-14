@@ -84,6 +84,7 @@ def loadTemplate(templateFile):
         template["heading"] = extractString(f, "[~heading]")
         template["contentSection"] = extractString(f, "[~contentSection]")
         template["content"] = extractString(f, "[~content]")
+        template["controls"] = extractString(f, "[~controlSection]")
     print("[+] Loaded all templates")
     return template
 
@@ -243,8 +244,8 @@ def loadFile(filePath):
     with open(filePath) as f:
         return f.read()
 
-def addControls(htmlContent):
-    htmlContent = htmlContent.replace("[~controls]", extractString("[~controlSection]"))
+def addControls(htmlContent, template):
+    htmlContent = htmlContent.replace("[~controls]", template["controls"])
     return htmlContent
 
 if len(sys.argv) < 2:
@@ -270,7 +271,7 @@ else:
         controls = getInput("[+] Add controls to bottom of page? Y/n (default n): ", ("Y", "y", "N", "n", ""))
         if controls in ("Y", "y"):
             print("    [+] Adding controls")
-            html = addControls(html)
+            html = addControls(html, template)
 
         html = setImageBackground(html)
 
